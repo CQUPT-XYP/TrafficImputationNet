@@ -71,7 +71,7 @@ scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.9)
 loss_function = ImputationLoss().to(device)
 
 
-def test(test_loader):
+def test():
     net.load_state_dict(torch.load(os.path.join(save_path, "best_model_{}.pth".format(loss_ratio)), map_location=device), False)
     net.eval()
     with torch.no_grad():
@@ -108,7 +108,7 @@ def test(test_loader):
         meae_num = np.average(meae_list)
         return loss_avg, mape_num, rmse_num, mae_num, meae_num
 
-def evaluate(val_loader):
+def evaluate():
     net.eval()
     with torch.no_grad():
         loss_list = []
@@ -146,7 +146,7 @@ def cal_loss(real, pred, batch_loss_indices, loss_matrix):
     return mape, rmse, mae, meae
 
 
-def train(train_loader, val_loader, test_loader, loss_ratio):
+def train():
     net.train()
     if not os.path.isdir(save_path):
         os.makedirs(save_path)
@@ -183,7 +183,7 @@ def train(train_loader, val_loader, test_loader, loss_ratio):
 
         
         train_loss = np.average(epoch_loss_list)
-        eval_loss = evaluate(val_loader=val_loader)
+        eval_loss = evaluate()
 
 
         print("train loss:{}, eval loss:{}, best loss:{}".format(train_loss, eval_loss, best_val_loss))
@@ -215,7 +215,7 @@ def train(train_loader, val_loader, test_loader, loss_ratio):
 
 
     # 在测试集上的结果
-    test_loss, test_mape, test_rmse, test_mae, test_meae = test(test_loader=test_loader)
+    test_loss, test_mape, test_rmse, test_mae, test_meae = test()
     print("loss ratio: {} --- dt: {} --- test loss:{}, test mape:{}, test_rmse:{}, test_mae:{}".format(loss_ratio, str(datetime.datetime.now()), test_loss, test_mape, test_rmse, test_mae))
     
     # result_file_path = os.path.join("./save_no_earlystop/result.txt")
@@ -224,4 +224,4 @@ def train(train_loader, val_loader, test_loader, loss_ratio):
     
 
 if __name__ == '__main__':
-    train(train_loader, val_loader, test_loader, loss_ratio)
+    train()
